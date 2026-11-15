@@ -1,0 +1,4 @@
+Accessibility audit, axe-core via Playwright (headless Chromium), run 15 Nov 2026
+Pages: project page (site), country app and whole-planet tab, listening test.
+Result: 0 violation types on each page. Rules: WCAG 2.0/2.1 A and AA tags.
+Limit: automated checks catch part of the problems; no screen-reader user has tested it yet.

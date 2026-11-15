@@ -1,0 +1,44 @@
+{
+ "greenness (index)": {
+  "pairs": 228,
+  "bias": 0.03,
+  "mean_abs_error": 0.04,
+  "median_abs_error": 0.03,
+  "rmse": 0.06,
+  "correlation_r": 0.905
+ },
+ "height of the land (m)": {
+  "pairs": 70,
+  "bias": 2.4,
+  "mean_abs_error": 15.62,
+  "median_abs_error": 7.5,
+  "rmse": 35.45,
+  "correlation_r": 0.996
+ },
+ "land temperature (C)": {
+  "pairs": 124,
+  "bias": -2.22,
+  "mean_abs_error": 3.38,
+  "median_abs_error": 2.49,
+  "rmse": 4.48,
+  "correlation_r": 0.894
+ },
+ "rain (mm per day)": {
+  "pairs": 106,
+  "bias": -0.69,
+  "mean_abs_error": 2.67,
+  "median_abs_error": 1.42,
+  "rmse": 4.66,
+  "correlation_r": 0.418,
+  "wet_or_dry_agree": 0.623,
+  "correlation_log": 0.519
+ },
+ "sea temperature (C)": {
+  "pairs": 108,
+  "bias": 0.13,
+  "mean_abs_error": 0.28,
+  "median_abs_error": 0.22,
+  "rmse": 0.36,
+  "correlation_r": 0.999
+ }
+}
