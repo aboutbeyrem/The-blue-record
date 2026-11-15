@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Blue Record · Hear any country on Earth</title>
+<meta name="description" content="Spin the globe, pick a country, and hear NASA’s live data for it: temperature, rain, height of the land, greenness.">
+<meta name="theme-color" content="#0f152e">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2715%27 fill=%27%2305070d%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%275.5%27 fill=%27%233d7dff%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="explore.css">
+<script>
+  // Inside the project website the page is loaded as index.html?embed=1.
+  if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embed');
+</script>
+</head>
+<body>
+<a class="skip" href="#main-content">Skip to the controls</a>
+<noscript><p class="noscript">The Blue Record needs JavaScript to turn NASA’s data into sound.</p></noscript>
+
+<header class="masthead">
+  <div class="brand">
+    <span class="brand-disc" aria-hidden="true"></span>
+    <div>
+      <h1>The Blue Record</h1>
+      <p class="tagline">Pick a place on Earth. Hear what NASA sees.</p>
+    </div>
+  </div>
+  <div class="modes" role="tablist" aria-label="Choose how to listen">
+    <button id="tabExplore" role="tab" aria-selected="true" aria-controls="explore" type="button">Pick a country</button>
+    <button id="tabRecord" role="tab" aria-selected="false" aria-controls="recordMode" type="button">Whole-planet record</button>
+  </div>
+  <button id="scienceBtn" class="ghost" type="button" aria-haspopup="dialog">ⓘ The science</button>
+  <button id="helpBtn" class="ghost" type="button" aria-haspopup="dialog">How to listen <kbd>H</kbd></button>
+</header>
+
+<!-- ============================================================ explore -->
+<main id="main-content" tabindex="-1">
+
+<div class="explore" id="explore" role="tabpanel" aria-labelledby="tabExplore">
+
+  <!-- Step 1 and 2: the globe, then the category panel beside it -->
+  <section class="globe-stage" id="stageGlobe" aria-labelledby="globeTitle">
+    <div class="globe-wrap" id="globeWrap">
+      <canvas id="globe" aria-hidden="true"></canvas>
+      <div class="globe-tip" id="globeTip" hidden></div>
+      <div class="globe-load" id="globeLoad" role="status">Loading the Earth…</div>
+      <p class="globe-hint" aria-hidden="true">Drag to spin · scroll to zoom · click a country</p>
+    </div>
+
+    <div class="side">
+      <div id="pickPanel">
+        <p class="step"><span>1</span> Pick a country</p>
+        <h2 id="globeTitle">Where on Earth?</h2>
+        <label class="search">
+          <span class="sr-only">Search for a country</span>
+          <input id="countrySearch" type="search" placeholder="Search a country…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="countryResults" aria-autocomplete="list">
+        </label>
+        <ul id="countryResults" class="results" role="listbox" aria-label="Countries" hidden></ul>
+        <p class="quick-label">Try one</p>
+        <div id="quickPicks" class="quick"></div>
+        <button id="locateBtn" class="locate" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
+          Use my location
+        </button>
+        <p id="locateMsg" class="fine" role="status"></p>
+      </div>
+
+      <div id="catPanel" hidden>
+        <p class="step"><span>2</span> What do you want to hear?</p>
+        <h2 id="catTitle">—</h2>
+        <p class="country-meta" id="catMeta"></p>
+        <div id="catList" class="cats"></div>
+        <button id="changeCountry" class="linkish" type="button">← Pick a different country</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 3: the country plays -->
+  <section class="play-stage" id="stagePlay" hidden aria-labelledby="playTitle">
+    <div class="play-bar">
+      <button id="backCat" class="linkish" type="button">← Other categories</button>
+      <button id="backGlobe" class="linkish" type="button">← Back to the globe</button>
+    </div>
+    <h2 id="playTitle" class="play-title">—</h2>
+
+    <div class="play-grid">
+      <div class="play-main">
+        <div class="map-wrap" id="mapWrap">
+          <canvas id="map" aria-hidden="true"></canvas>
+          <div class="map-load" id="mapLoad" role="status">Asking NASA…</div>
+          <div class="map-empty" id="mapEmpty" hidden></div>
+        </div>
+        <div class="legend" id="legend" aria-hidden="true"></div>
+
+        <div class="transport">
+          <button id="cPlay" class="primary" type="button" aria-pressed="false" disabled>
+            <span class="play-icon" aria-hidden="true"></span><span id="cPlayLabel">Play this country</span>
+          </button>
+          <button id="cWhere" type="button">Where am I? <kbd>W</kbd></button>
+          <button id="cSummary" type="button">What did I hear? <kbd>S</kbd></button>
+          <button id="cScience" type="button" class="ghost" aria-haspopup="dialog">ⓘ How is this calculated?</button>
+        </div>
+
+        <div class="arm-control">
+          <label for="cRow">Scan line <span class="muted">(north to south)</span></label>
+          <div class="arm-row">
+            <span class="end" aria-hidden="true">North</span>
+            <input id="cRow" type="range" min="0" max="100" step="1" value="50">
+            <span class="end" aria-hidden="true">South</span>
+          </div>
+        </div>
+
+        <details class="settings" open>
+          <summary>Settings</summary>
+          <div class="settings-grid">
+            <label class="field">Speed
+              <select id="cSpeed">
+                <option value="14">Slow</option>
+                <option value="9" selected>Normal</option>
+                <option value="5.5">Fast</option>
+              </select>
+            </label>
+            <label class="field">Each pass moves time by
+              <select id="cStride"></select>
+            </label>
+            <label class="field">Sound
+              <select id="cTone">
+                <option value="smooth">One smooth tone</option>
+                <option value="notes">Separate notes</option>
+              </select>
+            </label>
+            <label class="field">Volume
+              <input id="cVolume" type="range" min="0" max="1" step="0.05" value="0.8">
+            </label>
+            <label class="check"><input id="cDrone" type="checkbox" checked> Average drone</label>
+            <label class="check"><input id="cBling" type="checkbox" checked> Mars bling</label>
+            <label class="check"><input id="cVoice" type="checkbox" checked> Spoken answers</label>
+            <label class="field-inline">Voice <select id="cVoiceName" aria-label="Voice for spoken answers"><option>Default</option></select></label>
+          </div>
+        </details>
+      </div>
+
+      <aside class="readout" aria-labelledby="cReadTitle">
+        <h2 id="cReadTitle">Now playing</h2>
+        <p class="np-title" id="cTitle">—</p>
+        <dl class="np">
+          <div><dt>When</dt><dd id="cDate">—</dd></div>
+          <div><dt>Needle</dt><dd id="cNeedle">—</dd></div>
+          <div class="wide"><dt>Where</dt><dd id="cWhereText">—</dd></div>
+          <div class="wide"><dt>Under the needle</dt><dd id="cUnder">—</dd></div>
+          <div class="wide"><dt>Along this line</dt><dd id="cLine">—</dd></div>
+        </dl>
+
+        <div class="insight" id="cInsight" hidden>
+          <p class="acc-title">What the data says</p>
+          <p id="cInsightText"></p>
+        </div>
+
+        <div class="mars" id="marsCard">
+          <div class="mars-dot" aria-hidden="true"></div>
+          <div>
+            <p class="mars-title"><span id="marsTitle">Mars check</span> <span class="mars-badge" id="marsBadge">—</span></p>
+            <p class="fine"><span id="marsText">—</span><span id="marsHeard"></span></p>
+          </div>
+        </div>
+
+        <h3 id="cProfileTitle">The line you are hearing, west to east</h3>
+        <p class="fine" id="cProfileNote">—</p>
+        <canvas id="cProfile" class="chart" role="img" aria-labelledby="cProfileTitle cProfileNote"></canvas>
+
+        <h3 id="cChartTitle">This line through time</h3>
+        <p class="fine" id="cChartNote">—</p>
+        <canvas id="cChart" class="chart" role="img" aria-labelledby="cChartTitle cChartNote"></canvas>
+
+        <h3>Where this data comes from</h3>
+        <div id="cSources" class="sources"></div>
+      </aside>
+    </div>
+  </section>
+</div>
+
+<!-- ======================================================= whole planet -->
+<div class="layout" id="recordMode" role="tabpanel" aria-labelledby="tabRecord" hidden>
+
+  <section class="crate" aria-labelledby="crateTitle">
+    <h2 id="crateTitle">Records</h2>
+    <div id="crateList" class="crate-list" role="radiogroup" aria-labelledby="crateTitle"></div>
+    <p class="fine">Every record is real NASA data. The sound is made live from the pixels of the map you see.</p>
+  </section>
+
+  <section class="deck" id="deck" aria-labelledby="deckTitle" tabindex="-1">
+    <h2 id="deckTitle" class="sr-only">Turntable</h2>
+
+    <div class="plinth" id="plinth">
+      <div class="stage3d" id="stage3d">
+        <div class="deck-shadow" data-r="1.55" aria-hidden="true"></div>
+        <div class="platter" id="platter" data-r="1.075" aria-hidden="true"></div>
+        <div class="vinyl-edge" data-r="1" aria-hidden="true"></div>
+        <div class="flipper" id="flipper" data-r="1">
+          <canvas id="disc" aria-hidden="true"></canvas>
+        </div>
+        <canvas id="arm" aria-hidden="true"></canvas>
+      </div>
+      <div class="glare" aria-hidden="true"></div>
+      <div class="loading" id="loading" role="status">Loading record…</div>
+    </div>
+
+    <div class="transport">
+      <button id="playBtn" class="primary" type="button" aria-pressed="false" disabled>
+        <span class="play-icon" aria-hidden="true"></span><span id="playLabel">Drop the needle</span>
+      </button>
+      <button id="flipBtn" type="button">Flip to Side B</button>
+      <button id="whereBtn" type="button">Where am I? <kbd>W</kbd></button>
+    </div>
+
+    <div class="arm-control">
+      <label for="lat">Tonearm <span class="muted">(latitude)</span></label>
+      <div class="arm-row">
+        <span class="end" aria-hidden="true">Equator</span>
+        <input id="lat" type="range" min="2.5" max="80" step="2.5" value="37.5">
+        <span class="end" aria-hidden="true">Pole</span>
+      </div>
+      <div class="presets" role="group" aria-label="Jump the tonearm to">
+        <button type="button" data-lat="2.5">Equator</button>
+        <button type="button" data-lat="37.5">Tunis’s latitude</button>
+        <button type="button" data-lat="60">60°</button>
+        <button type="button" data-lat="75">Polar</button>
+      </div>
+    </div>
+
+    <details class="settings" open>
+      <summary>Settings</summary>
+      <div class="settings-grid">
+        <fieldset class="seg">
+          <legend>Speed</legend>
+          <div class="seg-row">
+            <label><input type="radio" name="speed" value="7.2"><span>33</span></label>
+            <label><input type="radio" name="speed" value="4.8" checked><span>45</span></label>
+            <label><input type="radio" name="speed" value="2.88"><span>78</span></label>
+          </div>
+        </fieldset>
+        <label class="field">Each spin moves time by
+          <select id="stride"></select>
+        </label>
+        <label class="field" id="toneField">Sound
+          <select id="tone">
+            <option value="smooth">One smooth tone</option>
+            <option value="notes">Separate notes</option>
+          </select>
+        </label>
+        <label class="field" id="scaleField">Notes
+          <select id="scale"></select>
+        </label>
+        <label class="field">Volume
+          <input id="volume" type="range" min="0" max="1" step="0.05" value="0.8">
+        </label>
+        <label class="check"><input id="drone" type="checkbox" checked> Average drone</label>
+        <label class="check"><input id="crackle" type="checkbox" checked> Vinyl crackle</label>
+        <label class="check"><input id="voice" type="checkbox" checked> Spoken answers</label>
+        <label class="check"><input id="haptics" type="checkbox" checked> Vibration (Android)</label>
+      </div>
+    </details>
+  </section>
+
+  <section class="readout" aria-labelledby="readTitle">
+    <h2 id="readTitle">Now playing</h2>
+    <p class="np-title" id="npTitle">—</p>
+    <dl class="np">
+      <div><dt>When</dt><dd id="npDate">—</dd></div>
+      <div><dt>Needle</dt><dd id="npLat">—</dd></div>
+      <div class="wide"><dt>Under the needle</dt><dd id="npUnder">—</dd></div>
+      <div class="wide"><dt>Around this latitude</dt><dd id="npMean">—</dd></div>
+    </dl>
+
+    <h3 id="stripTitle">What the needle reads</h3>
+    <p class="fine" id="stripNote">This latitude, unrolled from west to east.</p>
+    <canvas id="strip" class="strip" role="img" aria-labelledby="stripTitle stripNote"></canvas>
+    <div class="strip-axis" aria-hidden="true"><span>180° W</span><span>Greenwich</span><span>180° E</span></div>
+
+    <h3 id="chartTitle">This latitude through time</h3>
+    <p class="fine" id="chartNote">—</p>
+    <canvas id="chart" class="chart" role="img" aria-labelledby="chartTitle chartNote"></canvas>
+
+    <h3>Liner notes</h3>
+    <div id="liner" class="liner"></div>
+  </section>
+
+</div>
+
+</main>
+
+<footer class="credits">
+  <p id="credit">Data: NASA Global Imagery Browse Services (GIBS).</p>
+  <p>Country borders, sea names and cities: Natural Earth (public domain). Borders are shown as published there and are not a statement by NASA or by us. Mars facts: NASA Mars Fact Sheet. Made at the NASA Space Apps Challenge 2026, Tunis. Not affiliated with or endorsed by NASA. Values are read from the colors of NASA’s published maps using NASA’s own color tables, so they are as fine as those tables.</p>
+</footer>
+
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<dialog id="science" class="science" aria-labelledby="sciTitle"></dialog>
+
+<dialog id="help" aria-labelledby="helpTitle">
+  <form method="dialog">
+    <h2 id="helpTitle">How to listen</h2>
+    <h3>Pick a country</h3>
+    <ol class="how">
+      <li><strong>Spin the globe</strong> and click a country, or search for it. “Use my location” picks yours.</li>
+      <li><strong>Choose what to hear:</strong> temperature, rain, height of the land or greenness. NASA’s newest data is fetched live.</li>
+      <li><strong>One scan line sweeps the country</strong> from west to east. Higher and louder means more. Silence means no reading. Move the line north or south, and each pass moves time forward.</li>
+      <li><strong>Mars bling.</strong> When the data matches Mars, such as a place as cold as Mars’s average day, you hear a chime.</li>
+    </ol>
+    <h3>The whole-planet record</h3>
+    <ol class="how">
+      <li><strong>The record is the Earth.</strong> The centre is the pole, the edge is the equator. Side A is the northern half, Side B the southern.</li>
+      <li><strong>The tonearm is latitude.</strong> One spin carries the needle once around the planet along that latitude.</li>
+      <li><strong>Each spin moves time forward,</strong> so you hear the same latitude change through the year.</li>
+      <li id="helpMapping"><strong>The sound is the data.</strong></li>
+    </ol>
+    <h3>Keys</h3>
+    <dl class="keys">
+      <div><dt><kbd>Space</kbd></dt><dd>Play or pause</dd></div>
+      <div><dt><kbd>↑</kbd> <kbd>↓</kbd></dt><dd>Country: move the scan line</dd></div>
+      <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Whole planet: move the tonearm</dd></div>
+      <div><dt><kbd>F</kbd></dt><dd>Whole planet: flip the record</dd></div>
+      <div><dt><kbd>W</kbd></dt><dd>Where am I? Says the country, the nearest city and the value</dd></div>
+      <div><dt><kbd>S</kbd></dt><dd>What did I hear? Says the hottest, coolest and how it changed</dd></div>
+      <div><dt><kbd>Esc</kbd></dt><dd>Go back one step</dd></div>
+      <div><dt><kbd>1</kbd> to <kbd>5</kbd></dt><dd>Whole planet: choose a record</dd></div>
+      <div><dt><kbd>H</kbd></dt><dd>Open this help</dd></div>
+    </dl>
+    <p class="fine">Using a screen reader? Turn off “Spoken answers” in Settings so answers are not read twice.</p>
+    <button class="primary" value="close">Start listening</button>
+  </form>
+</dialog>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

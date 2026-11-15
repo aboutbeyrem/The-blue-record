@@ -1,0 +1,12 @@
+{
+ "pairs": 1980,
+ "points": 55,
+ "dates": 36,
+ "bias_c": -0.12,
+ "mean_abs_error_c": 0.68,
+ "rmse_c": 0.97,
+ "correlation_r": 0.993,
+ "within_1c_share": 0.792,
+ "within_2c_share": 0.929,
+ "reference": "NASA POWER daily TS (Earth Skin Temperature), from MERRA-2"
+}

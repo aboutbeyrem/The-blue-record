@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listening test · The Blue Record</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="explore.css">
+</head>
+<body class="lt-body">
+<main class="lt" id="main">
+  <p class="step"><span>T</span> Listening test</p>
+  <h1 id="ltTitle">Can you hear which country is hotter?</h1>
+  <p class="lt-lede">About three minutes. <strong>Headphones on.</strong> The listener closes their eyes or wears a blindfold, and a helper clicks the answers. You will hear two countries, A then B, from NASA’s newest data. Say which one is hotter, higher or greener.</p>
+
+  <section id="ltStart">
+    <label class="field">Listener name or number (optional)
+      <input id="ltName" type="text" maxlength="30" autocomplete="off">
+    </label>
+    <p class="fine">Nothing leaves this browser. Results are kept on this device only.</p>
+    <button id="ltGo" class="primary" type="button">Load the countries and start</button>
+    <p id="ltStatus" class="fine" role="status"></p>
+  </section>
+
+  <section id="ltRound" hidden aria-live="polite">
+    <p class="lt-count" id="ltCount"></p>
+    <h2 id="ltQuestion"></h2>
+    <div class="lt-play">
+      <button id="ltPlayAB" class="primary" type="button">Play A, then B</button>
+      <button id="ltPlayA" type="button">Only A</button>
+      <button id="ltPlayB" type="button">Only B</button>
+    </div>
+    <div class="lt-answers" role="group" aria-label="Your answer">
+      <button id="ltAnsA" type="button"></button>
+      <button id="ltAnsB" type="button"></button>
+      <button id="ltAnsNone" type="button">Can’t tell</button>
+    </div>
+  </section>
+
+  <section id="ltDone" hidden>
+    <h2>Done. Thank you.</h2>
+    <p id="ltResult" class="lt-big"></p>
+    <ul id="ltBreak" class="lt-break"></ul>
+    <h3>All listeners on this device</h3>
+    <p id="ltTotal" class="lt-big"></p>
+    <div class="lt-play">
+      <button id="ltCopy" type="button">Copy a summary for the pitch</button>
+      <button id="ltNext" class="primary" type="button">Next listener</button>
+      <button id="ltClear" type="button">Erase all results</button>
+    </div>
+    <p id="ltCopied" class="fine" role="status"></p>
+  </section>
+  <p class="fine"><a href="index.html">← Back to The Blue Record</a></p>
+</main>
+<script type="module" src="js/listentest.js"></script>
+</body>
+</html>
