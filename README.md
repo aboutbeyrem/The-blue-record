@@ -8,6 +8,7 @@ Demo video (25 s): https://the-blue-record.vercel.app/demo/blue-record-demo.mp4
 
 Built for the NASA Space Apps Challenge 2026, challenge
 [The Earth Information Jukebox](https://www.spaceappschallenge.org/2026/challenges/the-earth-information-jukebox/).
+Participant certificate, 14-15 November 2026: [PDF](docs/nasa-space-apps-2026-certificate.pdf).
 
 ## Why
 
@@ -106,4 +107,5 @@ page. The output was reviewed and edited by the team. All maps are NASA's or scr
 app, and every sound is synthesized live by the app's own code. No AI-generated images, video or
 audio are used.
 
-NASA does not endorse this project. No NASA logos are used.
+NASA does not endorse this project. No NASA logos are used in the project itself; the linked
+participant certificate is NASA's own document.
