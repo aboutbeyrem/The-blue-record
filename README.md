@@ -2,7 +2,8 @@
 
 **Hear the planet.** Pick a country on a 3D globe and hear what NASA's satellites see there, live.
 
-Live site: **https://the-blue-record.vercel.app**
+Live site: **https://the-blue-record.vercel.app**  
+Developer: [Beyrem Oueslati](https://www.aboutbeyrem.com), the only developer on a team of five.
 The app, full screen: https://the-blue-record.vercel.app/app/index.html
 Demo video (25 s): https://the-blue-record.vercel.app/demo/blue-record-demo.mp4
 
